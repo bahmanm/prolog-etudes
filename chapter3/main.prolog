@@ -1,8 +1,8 @@
+%% Dummy
 :- module(chapter3_main, [isList/1]).
 
 isList([]) :- true.
 isList([_|T]) :- isList(T).
-
 
 :- begin_tests(chapter3_main).
 
