@@ -1,4 +1,4 @@
-:- module(basic_list_techniques_recursion, [member/2, list/1]).
+:- module(basic_list_techniques_recursion, []).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

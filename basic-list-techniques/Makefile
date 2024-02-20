@@ -4,7 +4,7 @@ basic-list-techniques.root.dir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 ####################################################################################################
 
-basic-list-techniques.sources := recursion
+basic-list-techniques.sources := recursion mapping
 
 ####################################################################################################
 
