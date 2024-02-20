@@ -1,4 +1,6 @@
-:- module(basic_list_techniques_recursion, []).
+:- module(basic_list_techniques_recursion, [member/2, list/1]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 member(Element, [Element|_]).
 
@@ -6,7 +8,7 @@ member(Element, [_|Tail]) :-
     member(Element, Tail).
 
 
-:- begin_tests(basic_list_techniques_recursion).
+:- begin_tests(basic_list_techniques_recursion_member).
 
 test(member, nondet) :-
     member(a, [a])
@@ -14,4 +16,22 @@ test(member, nondet) :-
     , \+ member(x, [a, b, c])
     , \+ member(_, []).
 
-:- end_tests(basic_list_techniques_recursion).
+:- end_tests(basic_list_techniques_recursion_member).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+list([]).
+
+list([_|Tail]) :-
+    list(Tail).
+
+:- begin_tests(basic_list_techniques_recursion_list).
+
+test(list) :-
+    list([]),
+    list([1]),
+    list([[]]),
+    \+ list(5).
+
+:- end_tests(basic_list_techniques_recursion_list).
