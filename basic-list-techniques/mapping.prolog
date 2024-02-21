@@ -8,17 +8,15 @@ square(X, R) :-
 cube(X, R) :-
     R is X * X * X.
 
-map_element(X, XMapped) :-
+map_element(X, [X, square, XSquare, cube, XCube]) :-
     square(X, XSquare),
-    cube(X, XCube),
-    XMapped = [X, square, XSquare, cube, XCube].
+    cube(X, XCube).
 
 map([], []).
 
-map([Head|Tail], Mapped) :-
+map([Head|Tail], [HeadMapped|TailMapped]) :-
     map(Tail, TailMapped),
-    map_element(Head, HeadMapped),
-    Mapped = [HeadMapped|TailMapped].
+    map_element(Head, HeadMapped).
 
 
 :- begin_tests(basic_list_techniques_mapping_map).
