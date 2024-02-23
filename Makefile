@@ -12,7 +12,7 @@ include  bmakelib/bmakelib.mk
 
 ####################################################################################################
 
-etudes := chapter3
+etudes := basic-list-techniques
 etudes.makefiles := $(etudes:%=$(root.dir)%/Makefile)
 
 .PHONY : $(etudes.makefiles)
