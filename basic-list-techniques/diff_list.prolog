@@ -90,3 +90,32 @@ test(member_diff__bound_hole_unbound_X) :-
     Hole2 = [b, c], findall(X, member_diff(X, [a|Hole2]-Hole2), Result2), Result2 = [a, b, c].
 
 :- end_tests(basic_list_techniques_diff_list__member_diff).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Write a predicate reverse_diff(L, Reversed) that reverses a difference list and returns the
+% reversed version.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+reverse_diff(OpenList-Hole, Reversed) :-
+    var(Hole),
+    !,
+    Hole = [],
+    reverse(OpenList, Reversed).
+
+reverse_diff(OpenList-Hole, Reversed) :-
+    nonvar(Hole),
+    !,
+    reverse(OpenList, Reversed).
+
+:- begin_tests(basic_list_techniques_diff_list__reverse_diff).
+
+test(reverse_diff__unbound_hole) :-
+    reverse_diff([a|Hole1]-Hole1, [a]),
+    reverse_diff([a, b, c|Hole2]-Hole2, [c, b, a]).
+
+test(reverse_diff__bound_hole) :-
+    Hole1 = [], reverse_diff([a|Hole1]-Hole1, [a]),
+    Hole2 = [d, e], reverse_diff([a, b, c|Hole2]-Hole2, [e, d, c, b, a]).
+
+:- end_tests(basic_list_techniques_diff_list__reverse_diff).
