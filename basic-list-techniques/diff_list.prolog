@@ -19,3 +19,18 @@ test(append_diff__3) :-
 :- end_tests(basic_list_techniques_diff_list__append_diff).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+length_diff(OpenList-Hole, Length) :-
+    OpenList-Hole = ProperList-[],
+    length(ProperList, Length).
+
+:- begin_tests(basic_list_techniques_diff_list__length_diff).
+
+test(length_diff__1) :-
+    length_diff([a, b, c|Hole]-Hole, 3),
+    length_diff([a|Hole]-Hole, 1).
+
+test(length_diff__2) :-
+    OpenList = [], Hole = [], length_diff(OpenList-Hole, 0).
+
+:- end_tests(basic_list_techniques_diff_list__length_diff).
