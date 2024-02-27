@@ -8,7 +8,7 @@
 append_diff(OpenList1-Hole1, OpenList2-Hole2, OpenList1-Hole2) :-
     Hole1 = OpenList2.
 
-%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :- begin_tests(basic_list_techniques_diff_list__append_diff).
 
@@ -40,7 +40,7 @@ length_diff(OpenList-Hole, Length) :-
     OpenList = ProperList,
     length(ProperList, Length).
 
-%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :- begin_tests(basic_list_techniques_diff_list__length_diff).
 
@@ -75,7 +75,7 @@ member_diff(X, OpenList-Hole) :-
     nonvar(Hole), !,
     member(X, OpenList).
 
-%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :- begin_tests(basic_list_techniques_diff_list__member_diff).
 
@@ -114,7 +114,7 @@ reverse_diff(OpenList-Hole, Reversed) :-
     !,
     reverse(OpenList, Reversed).
 
-%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :- begin_tests(basic_list_techniques_diff_list__reverse_diff).
 
@@ -144,7 +144,7 @@ filter_even_diff(OpenList-Hole, Evens) :-
     !,
     filter_even_diff_helper(OpenList, AccHole-AccHole, Evens-[]).
 
-%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 filter_even_diff_helper([], Acc-AccHole, Acc-AccHole).
 
@@ -157,7 +157,7 @@ filter_even_diff_helper([Head|Tail], Acc-AccHole, Evens) :-
 filter_even_diff_helper([_|Tail], Acc-AccHole, Evens) :-
     filter_even_diff_helper(Tail, Acc-AccHole, Evens).
 
-%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :- begin_tests(basic_list_techniques_diff_list__filter_even_diff).
 
@@ -170,3 +170,47 @@ test(filter_even_diff__bound_hole) :-
     Hole2 = [6, 8, 9], filter_even_diff([1, 2, 3, 4|Hole2]-Hole2, [2, 4, 6, 8]).
 
 :- end_tests(basic_list_techniques_diff_list__filter_even_diff).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Write a predicate min_diff(L, Min) that finds the minimum element in a difference list and
+% returns it in Min.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+min_diff(OpenList-Hole, Min) :-
+    var(Hole),
+    !,
+    Hole = [],
+    [H|T] = OpenList,
+    min_diff_helper(T, H, Min).
+
+min_diff(OpenList-Hole, Min) :-
+    nonvar(Hole),
+    !,
+    [H|T] = OpenList,
+    min_diff_helper(T, H, Min).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+min_diff_helper([], Min, Min).
+
+min_diff_helper([H|T], MinSoFar, Min) :-
+    H < MinSoFar,
+    !,
+    min_diff_helper(T, H, Min).
+
+min_diff_helper([_|T], MinSoFar, Min) :-
+    min_diff_helper(T, MinSoFar, Min).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+:- begin_tests(basic_list_techniques_diff_list__min_diff).
+
+test(min_diff__unbound_hole) :-
+    min_diff([3|Hole1]-Hole1, 3),
+    min_diff([3, 1, 2|Hole2]-Hole2, 1).
+
+test(min_diff__bound_hole) :-
+    Hole1 = [], min_diff([3|Hole1]-Hole1, 3),
+    Hole2 = [5, 0], min_diff([3, 1, 2|Hole2]-Hole2, 0).
+
+:- end_tests(basic_list_techniques_diff_list__min_diff).
