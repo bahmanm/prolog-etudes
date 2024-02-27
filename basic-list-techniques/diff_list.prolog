@@ -5,21 +5,46 @@
 % combined list.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-append_diff(OpenList1-Hole1, OpenList2-Hole2, OpenList1-Hole2) :-
-    Hole1 = OpenList2.
+append_diff(OpenList1-OpenList2, OpenList2-Hole2, Result-ResultHole) :-
+    nonvar(OpenList2),
+    !,
+    Result = OpenList1,
+    ResultHole = Hole2.
+
+append_diff(OpenList1-Hole1, OpenList2-Hole2, Result-ResultHole) :-
+    var(Hole1),
+    !,
+    Hole1 = OpenList2,
+    Result-ResultHole = OpenList1-Hole2.
+
+append_diff(OpenList1-Hole1, OpenList2-Hole2, Result-ResultHole) :-
+    nonvar(Hole1),
+    !,
+    append(OpenList1, OpenList2, Result),
+    ResultHole = Hole2.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :- begin_tests(basic_list_techniques_diff_list__append_diff).
 
-test(append_diff__1) :-
+test(append_diff__unbound_holes_1) :-
     append_diff([a,b|Hole1]-Hole1, [c,d|Hole2]-Hole2, [a,b,c,d]-[]).
 
-test(append_diff__2) :-
+test(append_diff__unbound_holes_2) :-
     append_diff(Hole1-Hole1, [c,d|Hole2]-Hole2, [c,d]-[]).
 
-test(append_diff__3) :-
+test(append_diff__unbound_holes_3) :-
     append_diff(Hole1-Hole1, Hole2-Hole2, []-[]).
+
+test(append_diff__bound_holes_1) :-
+    Hole1=[x],
+    Hole2=[],
+    append_diff([a|Hole1]-Hole1, [c|Hole2]-Hole2, [a,x,c]-Hole2).
+
+test(append_diff__bound_holes_2) :-
+    Hole1=[x],
+    Hole2=[y],
+    append_diff(Hole1-Hole1, [c,d|Hole2]-Hole2, [x,c,d,y]-Hole2).
 
 :- end_tests(basic_list_techniques_diff_list__append_diff).
 
