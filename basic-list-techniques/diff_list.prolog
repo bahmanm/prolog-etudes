@@ -214,3 +214,58 @@ test(min_diff__bound_hole) :-
     Hole2 = [5, 0], min_diff([3, 1, 2|Hole2]-Hole2, 0).
 
 :- end_tests(basic_list_techniques_diff_list__min_diff).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Write a predicate insert_diff(X, Index, L, New) that inserts an element X at a specific Index
+% (starting from 1) in a difference list and returns the resulting list in New.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+insert_diff(X, Index, OpenList-Hole, ResultList-ResultHole) :-
+    var(Hole),
+    Hole = [],
+    insert_diff_helper(X, 1, Index, OpenList, AccHole-AccHole, ResultList-ResultHole),
+    !.
+
+insert_diff(X, Index, OpenList-Hole, ResultList-ResultHole) :-
+    nonvar(Hole),
+    insert_diff_helper(X, 1, Index, OpenList, AccHole-AccHole, ResultList-ResultHole),
+    !.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+insert_diff_helper(_, _, _, [], ResultList-ResultHole, ResultList-ResultHole).
+
+insert_diff_helper(_, CurrentIndex, Index, List, Acc-AccHole, ResultList-ResultHole) :-
+    CurrentIndex > Index,
+    append_diff(Acc-AccHole, List-NewAccHole, NewAcc-NewAccHole),
+    insert_diff_helper(_, CurrentIndex, Index, [], NewAcc-NewAccHole, ResultList-ResultHole).
+
+insert_diff_helper(X, CurrentIndex, Index, List, Acc-AccHole, ResultList-ResultHole) :-
+    CurrentIndex = Index,
+    NewCurrentIndex is CurrentIndex + 1,
+    append_diff(Acc-AccHole, [X|NewAccHole]-NewAccHole, NewAcc-NewAccHole),
+    insert_diff_helper(X, NewCurrentIndex, Index, List, NewAcc-NewAccHole, ResultList-ResultHole).
+
+insert_diff_helper(X, CurrentIndex, Index, [H|T], Acc-AccHole, ResultList-ResultHole) :-
+    CurrentIndex < Index,
+    NewCurrentIndex is CurrentIndex + 1,
+    append_diff(Acc-AccHole, [H|NewAccHole]-NewAccHole, NewAcc-NewAccHole),
+    insert_diff_helper(X, NewCurrentIndex, Index, T, NewAcc-NewAccHole, ResultList-ResultHole).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+:- begin_tests(basic_list_techniques_diff_list__insert_diff).
+
+test(insert_diff__unbound_hole) :-
+    insert_diff(x, 1, [a|Hole1]-Hole1, [x, a]-[]),
+    insert_diff(x, 2, [a|Hole2]-Hole2, [a, x]-[]),
+    insert_diff(x, 3, [a, b, c|Hole3]-Hole3, [a, b, x, c]-[]),
+    insert_diff(x, 1, Hole4-Hole4, [x]-[]).
+
+test(insert_diff__bound_hole) :-
+    Hole1 = [], insert_diff(x, 1, [a|Hole1]-Hole1, [x, a]-[]),
+    Hole2 = [], insert_diff(x, 2, [a|Hole2]-Hole2, [a, x]-[]),
+    Hole3 = [d, e], insert_diff(x, 3, [a, b, c|Hole3]-Hole3, [a, b, x, c, d, e]-[]),
+    Hole4 = [], insert_diff(x, 1, Hole4-Hole4, [x]-[]).
+
+:- end_tests(basic_list_techniques_diff_list__insert_diff).
