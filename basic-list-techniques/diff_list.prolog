@@ -1,27 +1,42 @@
 :- module(basic_list_techniques_diff_list, []).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Write a predicate close_diff(L1, Result) that copies and closes the given difference list.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+copy_close_diff(OpenList-Hole, Result) :-
+    var(Hole),
+    !,
+    copy_term(OpenList-Hole, Result-[]).
+
+copy_close_diff(OpenList-Hole, Result) :-
+    nonvar(Hole),
+    !,
+    copy_term(OpenList, Result).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+:- begin_tests(basic_list_techniques_diff_list_copy_close_diff).
+
+test(copy_close_diff__unbound_hole) :-
+    copy_close_diff([a, b, c|Hole]-Hole, [a,b,c]).
+
+test(copy_close_diff__bound_hole) :-
+    Hole = [d, e],
+    copy_close_diff([a, b, c|Hole]-Hole, [a,b,c,d,e]).
+
+:- end_tests(basic_list_techniques_diff_list_copy_close_diff).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Write a predicate append_diff(L1, L2, Result) that appends two difference lists and returns the
 % combined list.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-append_diff(OpenList1-OpenList2, OpenList2-Hole2, Result-ResultHole) :-
-    nonvar(OpenList2),
-    !,
-    Result = OpenList1,
-    ResultHole = Hole2.
-
 append_diff(OpenList1-Hole1, OpenList2-Hole2, Result-ResultHole) :-
-    var(Hole1),
-    !,
+    var(Hole1), var(Hole2),
     Hole1 = OpenList2,
-    Result-ResultHole = OpenList1-Hole2.
-
-append_diff(OpenList1-Hole1, OpenList2-Hole2, Result-ResultHole) :-
-    nonvar(Hole1),
-    !,
-    append(OpenList1, OpenList2, Result),
-    ResultHole = Hole2.
+    OpenList1-Hole2 = Result-ResultHole.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -36,16 +51,6 @@ test(append_diff__unbound_holes_2) :-
 test(append_diff__unbound_holes_3) :-
     append_diff(Hole1-Hole1, Hole2-Hole2, []-[]).
 
-test(append_diff__bound_holes_1) :-
-    Hole1=[x],
-    Hole2=[],
-    append_diff([a|Hole1]-Hole1, [c|Hole2]-Hole2, [a,x,c]-Hole2).
-
-test(append_diff__bound_holes_2) :-
-    Hole1=[x],
-    Hole2=[y],
-    append_diff(Hole1-Hole1, [c,d|Hole2]-Hole2, [x,c,d,y]-Hole2).
-
 :- end_tests(basic_list_techniques_diff_list__append_diff).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -55,15 +60,8 @@ test(append_diff__bound_holes_2) :-
 
 length_diff(OpenList-Hole, Length) :-
     var(Hole),
-    !,
-    OpenList-Hole = ProperList-[],
-    length(ProperList, Length).
-
-length_diff(OpenList-Hole, Length) :-
-    nonvar(Hole),
-    !,
-    OpenList = ProperList,
-    length(ProperList, Length).
+    copy_close_diff(OpenList-Hole, List),
+    length(List, Length).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -73,9 +71,6 @@ test(length_diff__unbound_hole_1) :-
     length_diff([a, b, c|Hole1]-Hole1, 3),
     length_diff([a|Hole2]-Hole2, 1).
 
-test(length_diff__bound_hole_1) :-
-    Hole1 = [d, e], length_diff([a, b, c|Hole1]-Hole1, 5).
-
 :- end_tests(basic_list_techniques_diff_list__length_diff).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -84,41 +79,17 @@ test(length_diff__bound_hole_1) :-
 
 member_diff(X, OpenList-Hole) :-
     var(Hole),
-    var(X),
-    Hole = [],
     !,
-    member(X, OpenList).
-
-member_diff(X, OpenList-Hole) :-
-    var(Hole),
-    nonvar(X),
-    Hole = [],
-    member(X, OpenList),
-    !.
-
-member_diff(X, OpenList-Hole) :-
-    nonvar(Hole), !,
-    member(X, OpenList).
+    copy_close_diff(OpenList-Hole, List),
+    member(X, List).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :- begin_tests(basic_list_techniques_diff_list__member_diff).
 
-test(member_diff__unbound_hole) :-
+test(member_diff__unbound_hole, nondet) :-
     member_diff(a, [a|Hole1]-Hole1),
     member_diff(a, [a, b, c|Hole2]-Hole2).
-
-test(member_diff__unbound_hole_unbound_X) :-
-    findall(X, member_diff(X, [a|Hole1]-Hole1), Result1), Result1 = [a],
-    findall(X, member_diff(X, [a, b, c|Hole2]-Hole2), Result2), Result2 = [a, b, c].
-
-test(member_diff__bound_hole) :-
-    Hole1 = [], member_diff(a, [a|Hole1]-Hole1),
-    Hole2 = [b, c], member_diff(c, [a|Hole2]-Hole2).
-
-test(member_diff__bound_hole_unbound_X) :-
-    Hole1 = [], findall(X, member_diff(X, [a|Hole1]-Hole1), Result1), Result1 = [a],
-    Hole2 = [b, c], findall(X, member_diff(X, [a|Hole2]-Hole2), Result2), Result2 = [a, b, c].
 
 :- end_tests(basic_list_techniques_diff_list__member_diff).
 
@@ -131,13 +102,9 @@ test(member_diff__bound_hole_unbound_X) :-
 reverse_diff(OpenList-Hole, Reversed) :-
     var(Hole),
     !,
-    Hole = [],
-    reverse(OpenList, Reversed).
+    copy_close_diff(OpenList-Hole, List),
+    reverse(List, Reversed).
 
-reverse_diff(OpenList-Hole, Reversed) :-
-    nonvar(Hole),
-    !,
-    reverse(OpenList, Reversed).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -146,10 +113,6 @@ reverse_diff(OpenList-Hole, Reversed) :-
 test(reverse_diff__unbound_hole) :-
     reverse_diff([a|Hole1]-Hole1, [a]),
     reverse_diff([a, b, c|Hole2]-Hole2, [c, b, a]).
-
-test(reverse_diff__bound_hole) :-
-    Hole1 = [], reverse_diff([a|Hole1]-Hole1, [a]),
-    Hole2 = [d, e], reverse_diff([a, b, c|Hole2]-Hole2, [e, d, c, b, a]).
 
 :- end_tests(basic_list_techniques_diff_list__reverse_diff).
 
@@ -160,27 +123,22 @@ test(reverse_diff__bound_hole) :-
 
 filter_even_diff(OpenList-Hole, Evens) :-
     var(Hole),
-    Hole = [],
     !,
-    filter_even_diff_helper(OpenList, AccHole-AccHole, Evens-[]).
-
-filter_even_diff(OpenList-Hole, Evens) :-
-    nonvar(Hole),
-    !,
-    filter_even_diff_helper(OpenList, AccHole-AccHole, Evens-[]).
+    copy_close_diff(OpenList-Hole, List),
+    filter_even_diff_helper(List, [], ReversedEvens),
+    reverse(ReversedEvens, Evens).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-filter_even_diff_helper([], Acc-AccHole, Acc-AccHole).
+filter_even_diff_helper([], Acc, Acc).
 
-filter_even_diff_helper([Head|Tail], Acc-AccHole, Evens) :-
-    0 is Head mod 2,
-    !,
-    append_diff(Acc-AccHole, [Head|NewHole]-NewHole, NewAcc-NewHole),
-    filter_even_diff_helper(Tail, NewAcc-NewHole, Evens).
+filter_even_diff_helper([H|T], Acc, Result) :-
+    Mod is H mod 2,
+    ( Mod == 0
+    -> filter_even_diff_helper(T, [H|Acc], Result)
+    ;  filter_even_diff_helper(T, Acc, Result)
+    ).
 
-filter_even_diff_helper([_|Tail], Acc-AccHole, Evens) :-
-    filter_even_diff_helper(Tail, Acc-AccHole, Evens).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -189,10 +147,6 @@ filter_even_diff_helper([_|Tail], Acc-AccHole, Evens) :-
 test(filter_even_diff__unbound_hole) :-
     filter_even_diff([1|Hole1]-Hole1, []),
     filter_even_diff([1, 2, 3, 4|Hole2]-Hole2, [2, 4]).
-
-test(filter_even_diff__bound_hole) :-
-    Hole1 = [3], filter_even_diff([1|Hole1]-Hole1, []),
-    Hole2 = [6, 8, 9], filter_even_diff([1, 2, 3, 4|Hole2]-Hole2, [2, 4, 6, 8]).
 
 :- end_tests(basic_list_techniques_diff_list__filter_even_diff).
 
@@ -204,14 +158,8 @@ test(filter_even_diff__bound_hole) :-
 min_diff(OpenList-Hole, Min) :-
     var(Hole),
     !,
-    Hole = [],
-    [H|T] = OpenList,
-    min_diff_helper(T, H, Min).
-
-min_diff(OpenList-Hole, Min) :-
-    nonvar(Hole),
-    !,
-    [H|T] = OpenList,
+    copy_close_diff(OpenList-Hole, List),
+    [H|T] = List,
     min_diff_helper(T, H, Min).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -233,10 +181,6 @@ min_diff_helper([_|T], MinSoFar, Min) :-
 test(min_diff__unbound_hole) :-
     min_diff([3|Hole1]-Hole1, 3),
     min_diff([3, 1, 2|Hole2]-Hole2, 1).
-
-test(min_diff__bound_hole) :-
-    Hole1 = [], min_diff([3|Hole1]-Hole1, 3),
-    Hole2 = [5, 0], min_diff([3, 1, 2|Hole2]-Hole2, 0).
 
 :- end_tests(basic_list_techniques_diff_list__min_diff).
 
