@@ -59,4 +59,6 @@ workflows:
   build_test:
     jobs:
       - test
-      - test_coverage
+      - test_coverage:
+          requires:
+            - test
