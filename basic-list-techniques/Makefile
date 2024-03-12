@@ -4,12 +4,26 @@ basic-list-techniques.root.dir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 ####################################################################################################
 
-basic-list-techniques.sources := recursion mapping mapping_nested diff_list
+define basic-list-techniques.sources :=
+	recursion
+	mapping
+	mapping_nested
+	diff_list
+endef
+
+define basic-list-techniques.modules :=
+	basic_list_techniques_recursion
+	basic_list_techniques_mapping
+	basic_list_techniques_mapping_nested
+	basic_list_techniques_diff_list
+endef
 
 ####################################################################################################
 
 .PHONY : basic-list-techniques.test
 
+basic-list-techniques.test : bmakelib.default-if-blank( test-coverage-report,no )
 basic-list-techniques.test :
-	cd $(basic-list-techniques.root.dir) \
-	&& swipl -g run_tests -t halt $(basic-list-techniques.sources:%=%.prolog)
+	$(if $(filter-out no,$(test-coverage-report)),\
+		$(call etude.test.with-coverage,basic-list-techniques),\
+		$(call etude.test.without-coverage,basic-list-techniques))
