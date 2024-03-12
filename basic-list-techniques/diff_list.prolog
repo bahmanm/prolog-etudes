@@ -130,7 +130,7 @@ filter_even_diff(OpenList-Hole, Evens) :-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-filter_even_diff_helper([], Acc, Acc).
+filter_even_diff_helper([], Result, Result).
 
 filter_even_diff_helper([H|T], Acc, Result) :-
     Mod is H mod 2,
@@ -189,52 +189,40 @@ test(min_diff__unbound_hole) :-
 % (starting from 1) in a difference list and returns the resulting list in New.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-insert_diff(X, Index, OpenList-Hole, ResultList-ResultHole) :-
-    var(Hole),
-    Hole = [],
-    insert_diff_helper(X, 1, Index, OpenList, AccHole-AccHole, ResultList-ResultHole),
-    !.
-
-insert_diff(X, Index, OpenList-Hole, ResultList-ResultHole) :-
-    nonvar(Hole),
-    insert_diff_helper(X, 1, Index, OpenList, AccHole-AccHole, ResultList-ResultHole),
-    !.
+insert_diff(X, Index, OpenList-Hole, Result-ResultHole) :-
+    nonvar(OpenList), var(Hole),
+    copy_close_diff(OpenList-Hole, ProperList),
+    insert_diff_helper(X, Index, 1, ProperList, [], Result-ResultHole), !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-insert_diff_helper(_, _, _, [], ResultList-ResultHole, ResultList-ResultHole).
-
-insert_diff_helper(_, CurrentIndex, Index, List, Acc-AccHole, ResultList-ResultHole) :-
+insert_diff_helper(X, Index, CurrentIndex, List, Acc, Result) :-
     CurrentIndex > Index,
-    append_diff(Acc-AccHole, List-NewAccHole, NewAcc-NewAccHole),
-    insert_diff_helper(_, CurrentIndex, Index, [], NewAcc-NewAccHole, ResultList-ResultHole).
+    append(Acc, [X|List], ResultProper),
+    proper_to_diff(ResultProper, Result).
 
-insert_diff_helper(X, CurrentIndex, Index, List, Acc-AccHole, ResultList-ResultHole) :-
-    CurrentIndex = Index,
-    NewCurrentIndex is CurrentIndex + 1,
-    append_diff(Acc-AccHole, [X|NewAccHole]-NewAccHole, NewAcc-NewAccHole),
-    insert_diff_helper(X, NewCurrentIndex, Index, List, NewAcc-NewAccHole, ResultList-ResultHole).
+insert_diff_helper(X, Index, CurrentIndex, [H|T], Acc, Result) :-
+    NextIndex is CurrentIndex + 1,
+    append(Acc, [H], NewAcc),
+    insert_diff_helper(X, Index, NextIndex, T, NewAcc, Result).
 
-insert_diff_helper(X, CurrentIndex, Index, [H|T], Acc-AccHole, ResultList-ResultHole) :-
-    CurrentIndex < Index,
-    NewCurrentIndex is CurrentIndex + 1,
-    append_diff(Acc-AccHole, [H|NewAccHole]-NewAccHole, NewAcc-NewAccHole),
-    insert_diff_helper(X, NewCurrentIndex, Index, T, NewAcc-NewAccHole, ResultList-ResultHole).
+insert_diff_helper(_, _, _, [], Acc, Result) :-
+    proper_to_diff(Acc, Result).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :- begin_tests(basic_list_techniques_diff_list__insert_diff).
 
 test(insert_diff__unbound_hole) :-
-    insert_diff(x, 1, [a|Hole1]-Hole1, [x, a]-[]),
-    insert_diff(x, 2, [a|Hole2]-Hole2, [a, x]-[]),
-    insert_diff(x, 3, [a, b, c|Hole3]-Hole3, [a, b, x, c]-[]),
-    insert_diff(x, 1, Hole4-Hole4, [x]-[]).
-
-test(insert_diff__bound_hole) :-
-    Hole1 = [], insert_diff(x, 1, [a|Hole1]-Hole1, [x, a]-[]),
-    Hole2 = [], insert_diff(x, 2, [a|Hole2]-Hole2, [a, x]-[]),
-    Hole3 = [d, e], insert_diff(x, 3, [a, b, c|Hole3]-Hole3, [a, b, x, c, d, e]-[]),
-    Hole4 = [], insert_diff(x, 1, Hole4-Hole4, [x]-[]).
+    insert_diff(x, 0, [a|Hole1]-Hole1, Result1), Result1 = [x,a|_]-_,
+    insert_diff(x, 1, [a|Hole2]-Hole2, Result2), Result2 = [a,x|_]-_,
+    insert_diff(x, 3, [a, b, c|Hole3]-Hole3, Result3), Result3 = [a, b, c, x|_]-_.
 
 :- end_tests(basic_list_techniques_diff_list__insert_diff).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Write a predicate proper_to_diff(L, L-H) that converts a proper list to an open list.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+proper_to_diff(ProperList, OpenList-Hole) :-
+    append(ProperList, Hole, OpenList).
