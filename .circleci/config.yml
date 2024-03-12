@@ -26,7 +26,7 @@ jobs:
           name: Install the runtime
           command: >-
             zypper --non-interactive refresh
-            && zypper --non-interactive install swipl
+            && zypper --non-interactive install swipl python311-coverage gcovr
 
       - checkout
 
