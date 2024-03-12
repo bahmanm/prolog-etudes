@@ -35,7 +35,9 @@ jobs:
             make test-coverage-report=yes test
 
       - codecov/upload:
-          file: ".coverage"
+          upload_args: >-
+            --coverage-files-search-root-folder=_build/test-coverage
+            --report-type=coverage
 
 workflows:
   build_test:
