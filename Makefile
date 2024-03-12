@@ -55,7 +55,7 @@ define etude.test.with-coverage
 cd $($(1).root.dir) \
 && swipl \
 	-g 'coverage(run_tests).' \
-	-g 'cov_save_data($(test.coverage-data.file)).' \
+	-g 'cov_save_data("$(test.coverage-data.file)").' \
 	-g 'show_coverage([ \
 		  all(false) \
 		, color(false) \
