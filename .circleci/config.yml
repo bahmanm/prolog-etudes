@@ -10,7 +10,7 @@ jobs:
   test:
 
     docker:
-      - image: bdockerimg/bmakelib:opensuse-tumbleweed
+      - image: bdockerimg/bmakelib:0.7.0--opensuse-tumbleweed
         auth:
           username: "${DOCKER_USER}"
           password: "${DOCKER_TOKEN}"
