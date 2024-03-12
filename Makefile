@@ -39,6 +39,7 @@ test : $(etudes:%=%.test)
 ####################################################################################################
 
 test.coverage-report.dir := $(build.dir)test-coverage/
+test.coverage-data.file := $(build.dir)test-coverage.data
 
 ####################################################################################################
 
@@ -53,7 +54,8 @@ endef
 define etude.test.with-coverage
 cd $($(1).root.dir) \
 && swipl \
-	-g 'coverage(run_tests).'\
+	-g 'coverage(run_tests).' \
+	-g 'cov_save_data($(test.coverage-data.file)).' \
 	-g 'show_coverage([ \
 		  all(false) \
 		, color(false) \
