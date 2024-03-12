@@ -1,6 +1,51 @@
 :- module(basic_list_techniques_diff_list, []).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Write a predicate verify_diff(L-H, L) which success only if a diff list sans hold equals a given
+% list.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+verify_diff(_-_, []).
+
+verify_diff([H|OT]-Hole, [H|T]) :-
+    var(Hole),
+    verify_diff(OT-Hole, T).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+:- begin_tests(basic_list_techniques_diff_list__verify_diff).
+
+test(verify_diff) :-
+    verify_diff(Hole1-Hole1, []),
+    verify_diff([a|Hole2]-Hole2, [a]),
+    verify_diff([a,b|Hole3]-Hole3, [a,b]).
+
+:- end_tests(basic_list_techniques_diff_list__verify_diff).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Write a predicate proper_to_diff(L, L-H) that converts a proper list to an open list.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+proper_to_diff(ProperList, OpenList-Hole) :-
+    append(ProperList, Hole, OpenList).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+:- begin_tests(basic_list_techniques_diff_list__proper_to_diff).
+
+test(proper_to_diff) :-
+    proper_to_diff([], OL1-Hole1),
+    verify_diff(OL1-Hole1, []),
+
+    proper_to_diff([a], OL2-Hole2),
+    verify_diff(OL2-Hole2, [a]),
+
+    proper_to_diff([a,b], OL3-Hole3),
+    verify_diff(OL3-Hole3, [a,b]).
+
+:- end_tests(basic_list_techniques_diff_list__proper_to_diff).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Write a predicate close_diff(L1, Result) that copies and closes the given difference list.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -147,7 +192,6 @@ filter_even_diff_helper([H|T], Acc, Result) :-
 test(filter_even_diff__unbound_hole) :-
     filter_even_diff([1|Hole1]-Hole1, []),
     filter_even_diff([1, 2, 3, 4|Hole2]-Hole2, [2, 4]).
-
 :- end_tests(basic_list_techniques_diff_list__filter_even_diff).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -214,15 +258,15 @@ insert_diff_helper(_, _, _, [], Acc, Result) :-
 :- begin_tests(basic_list_techniques_diff_list__insert_diff).
 
 test(insert_diff__unbound_hole) :-
-    insert_diff(x, 0, [a|Hole1]-Hole1, Result1), Result1 = [x,a|_]-_,
-    insert_diff(x, 1, [a|Hole2]-Hole2, Result2), Result2 = [a,x|_]-_,
-    insert_diff(x, 3, [a, b, c|Hole3]-Hole3, Result3), Result3 = [a, b, c, x|_]-_.
+    insert_diff(x, 0, [a|Hole1]-Hole1, Result1),
+    verify_diff(Result1, [x,a]),
+
+    insert_diff(x, 1, [a|Hole2]-Hole2, Result2),
+    verify_diff(Result2, [a,x]),
+
+    insert_diff(x, 3, [a, b, c|Hole3]-Hole3, Result3),
+    verify_diff(Result3, [a, b, c, x]).
 
 :- end_tests(basic_list_techniques_diff_list__insert_diff).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Write a predicate proper_to_diff(L, L-H) that converts a proper list to an open list.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-proper_to_diff(ProperList, OpenList-Hole) :-
-    append(ProperList, Hole, OpenList).
