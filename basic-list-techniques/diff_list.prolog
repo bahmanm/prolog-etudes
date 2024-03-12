@@ -226,3 +226,14 @@ test(insert_diff__unbound_hole) :-
 
 proper_to_diff(ProperList, OpenList-Hole) :-
     append(ProperList, Hole, OpenList).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+:- begin_tests(basic_list_techniques_diff_list__proper_to_diff).
+
+test(proper_to_diff) :-
+    proper_to_diff([], [_]-_),
+    proper_to_diff([a], [a|_]-_),
+    proper_to_diff([a,b], [a,b|_]-_).
+
+:- end_tests(basic_list_techniques_diff_list__proper_to_diff).
