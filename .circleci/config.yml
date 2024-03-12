@@ -11,6 +11,9 @@ jobs:
 
     docker:
       - image: bdockerimg/bmakelib:opensuse-tumbleweed
+        auth:
+          username: "${DOCKER_USER}"
+          password: "${DOCKER_TOKEN}"
         environment:
           LANG: en_US.UTF-8
     resource_class: medium
