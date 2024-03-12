@@ -10,7 +10,7 @@ jobs:
   test:
 
     docker:
-      - image: bockerimg/bmakelib:opensuse-tumbleweed
+      - image: bdockerimg/bmakelib:opensuse-tumbleweed
         environment:
           LANG: en_US.UTF-8
     resource_class: medium
