@@ -57,14 +57,9 @@ jobs:
       - attach_workspace:
           at: _build
 
-      - run:
-          name: List the files
-          command: >-
-            ls -alh _build/test-coverage
-
       - codecov/upload:
           upload_args: >-
-            --dir=_build/test-coverage
+            --dir=_build/test-coverage/basic-list-techniques/
             --report-type=coverage
 
 workflows:
