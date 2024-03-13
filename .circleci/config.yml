@@ -48,12 +48,6 @@ jobs:
   test_coverage:
     executor: docker
     steps:
-      - run:
-          name: Install the test-coverage tooling
-          command: >-
-            zypper --non-interactive refresh
-            && zypper --non-interactive install python311-coverage gcovr
-
       - attach_workspace:
           at: _build
 
