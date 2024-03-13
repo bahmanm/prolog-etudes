@@ -38,7 +38,7 @@ test : $(etudes:%=%.test)
 
 ####################################################################################################
 
-test.coverage-report.dir := $(build.dir)test-coverage/
+test.coverage-report.dir := $(build.dir)test-coverage-reports/
 test.coverage-data.file := $(build.dir)test-coverage.data
 
 ####################################################################################################
@@ -53,7 +53,6 @@ endef
 # 1: etude
 define etude.test.with-coverage
 cd $($(1).root.dir) \
-&& mkdir -p $(test.coverage-report.dir)$(1) \
 && swipl \
 	-g 'coverage(run_tests).' \
 	-g 'cov_save_data("$(test.coverage-data.file)", [append(true)]).' \
@@ -66,7 +65,7 @@ cd $($(1).root.dir) \
 		, modules([$(call root.etude.modules,$(1))]) \
             ]).' \
 	-t 'halt.' \
-	$($(1).sources:%=%.prolog) 2 > $(test.coverage-report.dir)$(1)/coverage.txt
+	$($(1).sources:%=%.prolog) 2 > $(test.coverage-report.dir)$(1).txt
 endef
 
 ####################################################################################################

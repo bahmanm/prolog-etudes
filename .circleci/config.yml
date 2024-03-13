@@ -39,7 +39,7 @@ jobs:
       - persist_to_workspace:
           root: _build
           paths:
-            - test-coverage
+            - test-coverage-reports
 
       - store_artifacts:
           path: _build/test-coverage.data
@@ -53,7 +53,7 @@ jobs:
 
       - codecov/upload:
           upload_args: >-
-            --dir=_build/test-coverage/basic-list-techniques/
+            --dir=_build/test-coverage-reports/
             --report-type=coverage
 
 workflows:
