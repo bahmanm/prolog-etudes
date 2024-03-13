@@ -53,18 +53,20 @@ endef
 # 1: etude
 define etude.test.with-coverage
 cd $($(1).root.dir) \
+&& mkdir -p $(test.coverage-report.dir)$(1) \
 && swipl \
 	-g 'coverage(run_tests).' \
 	-g 'cov_save_data("$(test.coverage-data.file)", [append(true)]).' \
 	-g 'show_coverage([ \
 		  all(false) \
 		, color(false) \
-		, ext(".txt") \
+		, annotate(false) \
+		, line_numbers(true) \
+		, width(140) \
 		, modules([$(call root.etude.modules,$(1))]) \
-		, dir("$(test.coverage-report.dir)") \
             ]).' \
 	-t 'halt.' \
-	$($(1).sources:%=%.prolog)
+	$($(1).sources:%=%.prolog) 2 > $(test.coverage-report.dir)$(1)/coverage.txt
 endef
 
 ####################################################################################################
