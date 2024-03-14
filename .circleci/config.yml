@@ -60,7 +60,7 @@ jobs:
 
       - codecov/upload:
           upload_args: >-
-            --dir=_build/test-coverage-reports/basic-list-techniques
+            --dir=_build/test-coverage-reports
             --report-type=coverage
 
 workflows:
