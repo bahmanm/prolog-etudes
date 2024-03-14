@@ -76,7 +76,8 @@ jobs:
             source .env/bin/activate
             && codecovcli --verbose \
                upload-process \
-               --token ${CODECOV_TOKEN} \
+               --token "${CODECOV_TOKEN}" \
+               --git-service github \
                --fail-on-error \
                --dir=_build/test-coverage-reports \
                --report-type=coverage
