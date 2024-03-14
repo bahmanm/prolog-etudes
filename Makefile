@@ -22,7 +22,7 @@ include  $(etudes.makefiles)
 ####################################################################################################
 
 $(build.dir) :
-	mkdir -p $(@)
+	mkdir -p $(@) $(test.coverage-report.dir)
 
 ####################################################################################################
 
@@ -51,6 +51,13 @@ endef
 ####################################################################################################
 
 # 1: etude
+define etude.test.coverage-report-file
+$(test.coverage-report.dir)$(1).txt
+endef
+
+####################################################################################################
+
+# 1: etude
 define etude.test.with-coverage
 cd $($(1).root.dir) \
 && swipl \
@@ -65,7 +72,8 @@ cd $($(1).root.dir) \
 		, modules([$(call root.etude.modules,$(1))]) \
             ]).' \
 	-t 'halt.' \
-	$($(1).sources:%=%.prolog) 2 > $(test.coverage-report.dir)$(1).txt
+	$($(1).sources:%=%.prolog) 2 > $(call etude.test.coverage-report-file,$(1)) \
+&& $(root.dir)bin/coverage-report-converter.pl $(call etude.test.coverage-report-file,$(1))
 endef
 
 ####################################################################################################

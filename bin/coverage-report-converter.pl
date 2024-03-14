@@ -17,49 +17,6 @@ use constant {
 
 ####################################################################################################
 
-# Extract the lines which not are comments or tests from the given Prolog file.
-sub source_file_trim ( $filepath )
-{
-  open ( my $fh, "<${filepath}" ) or die ( "open(): $!\n" ) ;
-
-  my @lines    = () ;
-  my $in_tests = false ;
-  while ( my $line = <$fh> )
-  {
-    chomp ( $line ) ;
-    if ( $line =~ /^\s*%/ or $line =~ /^\s*$/ )
-    {
-      next ;
-    }
-    elsif ( $line =~ /^\s*:-\s+begin_tests/ )
-    {
-      $in_tests = true ;
-      next ;
-    }
-    elsif ( $line =~ /^\s*:-\s+end_tests/ )
-    {
-      $in_tests = false ;
-      next ;
-    }
-    elsif ( $line =~ /^\s*:-\s+module/ )
-    {
-      next ;
-    }
-    elsif ( $in_tests == true )
-    {
-      next ;
-    }
-    else
-    {
-      push ( @lines, $line ) ;
-    }
-  }
-  close ( $fh ) ;
-  return @lines ;
-}
-
-####################################################################################################
-
 sub read_coverage_data ( $filepath )
 {
   open ( my $fh, "<$filepath" ) or die ( "open(): $!\n" ) ;
@@ -101,7 +58,8 @@ sub produce_coverage_report ( $coverage_rows, $coverage_file )
 
   say $fh ( "-" x 80 ) ;
   say $fh ( "Directory: ${etude_name}" ) ;
-  say $fh ( "File                                       Lines    Exec  Cover   Missing" ) ;
+  say $fh ( "File\tLines\tExec\tCover\tMissing" ) ;
+
   my ( $total_clauses, $total_tested ) = ( 0, 0 ) ;
   foreach my $row ( @$coverage_rows )
   {
@@ -117,18 +75,17 @@ sub produce_coverage_report ( $coverage_rows, $coverage_file )
   }
   my $total_coverage    = ( $total_tested / $total_clauses ) * 100 ;
   my $total_not_covered = $total_clauses - $total_tested ;
+
   printf $fh (
     "TOTAL\t%d\t%d\t%.2f\t%d\n", $total_clauses, $total_tested,
     $total_coverage,             $total_not_covered
   ) ;
+
   close ( $fh ) ;
 }
 
 ####################################################################################################
 
-# my $coverage_file =
-#   "/home/bahman/workspace/garden/prolog/_build/test-coverage-reports/basic-list-techniques.txt"
-#   ;
 my $coverage_file = shift or die ( "No coverage report specified.\n" ) ;
 my @coverage_rows = read_coverage_data ( $coverage_file ) ;
 produce_coverage_report ( \@coverage_rows, $coverage_file ) ;

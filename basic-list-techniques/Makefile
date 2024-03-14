@@ -22,8 +22,10 @@ endef
 
 .PHONY : basic-list-techniques.test
 
-basic-list-techniques.test : bmakelib.default-if-blank( test-coverage-report,no )
+basic-list-techniques.test : bmakelib.default-if-blank( test.produce-coverage-report,no )
 basic-list-techniques.test :
-	$(if $(filter-out no,$(test-coverage-report)),\
+	$(if $(filter-out no,$(test.produce-coverage-report)),\
 		$(call etude.test.with-coverage,basic-list-techniques),\
 		$(call etude.test.without-coverage,basic-list-techniques))
+
+####################################################################################################
