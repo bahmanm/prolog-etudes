@@ -34,7 +34,7 @@ jobs:
       - run:
           name: Run the tests
           command: >-
-            make test-coverage-report=yes test
+            make test.produce-coverage-report=yes test
 
       - persist_to_workspace:
           root: _build
