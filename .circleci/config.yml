@@ -46,12 +46,19 @@ jobs:
     executor: docker
     steps:
       - run:
-          name: Install Codecov CLI
+          name: Install Python
           command: >-
             zypper --non-interactive refresh
-            && zypper --non-interactive install python311-codecov
+            && zypper --non-interactive install python311
 
       - checkout
+
+      - run:
+          name: Install Codecov-cli
+          command: >-
+            python3 -m venv .env
+            && source .env/bin/activate
+            && pip install -r requirements.txt
 
       - attach_workspace:
           at: _build
@@ -66,11 +73,10 @@ jobs:
       - run:
           name: Upload the coverage reports
           command: >-
-            codecovcli
-            -t ${CODECOV_TOKEN}
-            --verbose upload-process --fail-on-error
-            --dir=_build/test-coverage-reports
-            --report-type=coverage
+            source .env/bin/activate
+            && codecovcli -t ${CODECOV_TOKEN} --verbose upload-process --fail-on-error \
+               --dir=_build/test-coverage-reports \
+               --report-type=coverage
 
 workflows:
   build_test:
