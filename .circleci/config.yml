@@ -2,37 +2,71 @@
 
 version: 2.1
 
+orbs:
+  codecov: codecov/codecov@4.0.1
+
+executors:
+  docker:
+    docker:
+      - image: bdockerimg/bmakelib:0.7.0--opensuse-tumbleweed
+        auth:
+          username: "${DOCKER_USER}"
+          password: "${DOCKER_TOKEN}"
+        environment:
+          LANG: en_US.UTF-8
+    working_directory: ~/prolog-etudes
+    resource_class: medium
+
+
 jobs:
 
   test:
-
-    docker:
-      - image: opensuse/tumbleweed:latest
-        environment:
-          LANG: en_US.UTF-8
-    resource_class: medium
-
-    working_directory: ~/prolog-etudes
-
+    executor: docker
     steps:
-
       - run:
           name: Install the runtime
           command: >-
             zypper --non-interactive refresh
-            && zypper --non-interactive install swipl make perl
-            && rpm --install --nosignature \
-                 https://github.com/bahmanm/bmakelib/releases/download/v0.7.0/bmakelib-0.7.0-1.1.noarch.rpm \
-            && { source /etc/profile || true; }
+            && zypper --non-interactive install swipl
 
       - checkout
 
       - run:
           name: Run the tests
           command: >-
-            make test
+            make test.produce-coverage-report=yes test
+
+      - persist_to_workspace:
+          root: _build
+          paths:
+            - test-coverage-reports
+
+      - store_artifacts:
+          path: _build/test-coverage.data
+          destination: test-coverage.data
+
+  test_coverage:
+    executor: docker
+    steps:
+      - attach_workspace:
+          at: _build
+
+      - run:
+          name: Remove the backup files
+          command: >-
+            find _build/test-coverage-reports
+            -type f -name '*.bak'
+            -exec rm -f {} \;
+
+      - codecov/upload:
+          upload_args: >-
+            --dir=_build/test-coverage-reports
+            --report-type=coverage
 
 workflows:
   build_test:
     jobs:
       - test
+      - test_coverage:
+          requires:
+            - test

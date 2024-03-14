@@ -4,6 +4,7 @@ SHELL := /usr/bin/env bash
 ####################################################################################################
 
 root.dir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+build.dir := $(root.dir)_build/
 
 ####################################################################################################
 
@@ -21,7 +22,7 @@ include  $(etudes.makefiles)
 ####################################################################################################
 
 $(build.dir) :
-	mkdir -p $(@)
+	mkdir -p $(@) $(test.coverage-report.dir)
 
 ####################################################################################################
 
@@ -32,4 +33,59 @@ clean :
 
 ####################################################################################################
 
+test : | $(build.dir)
 test : $(etudes:%=%.test)
+
+####################################################################################################
+
+test.coverage-report.dir := $(build.dir)test-coverage-reports/
+test.coverage-data.file := $(build.dir)test-coverage.data
+
+####################################################################################################
+
+# 1: etude
+define etude.modules
+$(subst $(bmakelib.space),$(bmakelib.comma),$(strip $($(1).modules)))
+endef
+
+####################################################################################################
+
+# 1: etude
+define etude.test.coverage-report-file
+$(test.coverage-report.dir)$(1)/coverage.txt
+endef
+
+####################################################################################################
+
+# 1: etude
+define etude.test.with-coverage
+cd $($(1).root.dir) \
+&& mkdir -p $(test.coverage-report.dir)$(1) \
+&& swipl \
+	-g 'coverage(run_tests).' \
+	-g 'cov_save_data("$(test.coverage-data.file)", [append(true)]).' \
+	-g 'show_coverage([ \
+		  all(false) \
+		, color(false) \
+		, annotate(false) \
+		, line_numbers(true) \
+		, width(140) \
+		, modules([$(call root.etude.modules,$(1))]) \
+            ]).' \
+	-t 'halt.' \
+	$($(1).sources:%=%.prolog) 2 > $(call etude.test.coverage-report-file,$(1)) \
+&& $(root.dir)bin/coverage-report-converter.pl $(call etude.test.coverage-report-file,$(1))
+endef
+
+####################################################################################################
+
+# 1: etude
+define etude.test.without-coverage
+cd $($(1).root.dir) \
+&& swipl \
+	-g 'run_tests.'\
+	-t 'halt.' \
+	$($(1).sources:%=%.prolog)
+endef
+
+####################################################################################################
