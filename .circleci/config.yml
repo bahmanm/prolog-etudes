@@ -66,8 +66,9 @@ jobs:
       - run:
           name: Upload the coverage reports
           command: >-
-            codecovli
-            --verbose upload-process --fail-on-error -t ${{ CODECOV_TOKEN }}
+            codecovcli
+            -t ${CODECOV_TOKEN}
+            --verbose upload-process --fail-on-error
             --dir=_build/test-coverage-reports
             --report-type=coverage
 
