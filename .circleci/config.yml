@@ -48,6 +48,8 @@ jobs:
   test_coverage:
     executor: docker
     steps:
+      - checkout
+
       - attach_workspace:
           at: _build
 
