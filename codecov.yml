@@ -6,13 +6,12 @@ codecov:
   notify:
     after_n_builds: 1
 
-coverage":
+coverage:
   status:
     project:
       default:
         branches:
           - "main"
-          - "enable-code-coverage-in-the-pipeline"
         target: "70%"
         threshold: "5%"
         base: auto
