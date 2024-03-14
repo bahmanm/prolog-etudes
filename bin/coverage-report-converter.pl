@@ -54,9 +54,12 @@ sub produce_coverage_report ( $coverage_rows, $coverage_file )
 
   open ( my $fh, ">$coverage_file" ) or die ( "open(): $!\n" ) ;
 
-  say $fh ( "-" x 80 ) ;
-  say $fh ( "Directory: ${etude_name}" ) ;
-  say $fh ( "File\tLines\tExec\tCover\tMissing" ) ;
+  printf $fh ( "%s\n",            "-" x 78 ) ;
+  printf $fh ( "%20s%s\n",        " ", "SWI-Prologo Code Coverage Report" ) ;
+  printf $fh ( "Directory: %s\n", $etude_name ) ;
+  printf $fh ( "%s\n",            "-" x 78 ) ;
+  print $fh ( "File                                       Lines    Exec  Cover   Missing\n" ) ;
+  printf $fh ( "%s\n", "-" x 78 ) ;
 
   my ( $total_clauses, $total_tested ) = ( 0, 0 ) ;
   foreach my $row ( @$coverage_rows )
@@ -67,17 +70,20 @@ sub produce_coverage_report ( $coverage_rows, $coverage_file )
     $total_clauses += $row->{ clauses } ;
     $total_tested  += $covered ;
     printf $fh (
-      "%s\t%d\t%d\t%.2f\t%d\n", "${module_name}${ext}",     $row->{ clauses },
-      $covered,                 $row->{ coverage_percent }, $not_covered
+      "%-43s%5u    %4u  %4u%%   %-7u\n",
+      "${module_name}${ext}", $row->{ clauses },
+      $covered, $row->{ coverage_percent }, $not_covered
     ) ;
+    printf $fh ( "%s\n", "-" x 78 ) ;
   }
   my $total_coverage    = ( $total_tested / $total_clauses ) * 100 ;
   my $total_not_covered = $total_clauses - $total_tested ;
 
   printf $fh (
-    "TOTAL\t%d\t%d\t%.2f\t%d\n", $total_clauses, $total_tested,
-    $total_coverage,             $total_not_covered
+    "%-43s%5u    %4u  %4u%%   %-7u\n",
+    "TOTAL", $total_clauses, $total_tested, $total_coverage, $total_not_covered
   ) ;
+  printf $fh ( "%s\n", "-" x 78 ) ;
 
   close ( $fh ) ;
 }
