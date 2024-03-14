@@ -60,11 +60,13 @@ jobs:
       - run:
           name: Remove the backup files
           command: >-
-            rm -f _build/test-coverage-reports/*.bak
+            find _build/test-coverage-reports
+            -type f -name '*.bak'
+            -exec rm -f {} \;
 
       - codecov/upload:
           upload_args: >-
-            --dir=_build/test-coverage-reports/
+            --dir=_build/test-coverage-reports/basic-list-techniques
             --report-type=coverage
 
 workflows:

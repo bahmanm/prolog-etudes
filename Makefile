@@ -52,7 +52,7 @@ endef
 
 # 1: etude
 define etude.test.coverage-report-file
-$(test.coverage-report.dir)$(1).txt
+$(test.coverage-report.dir)$(1)/coverage.txt
 endef
 
 ####################################################################################################
@@ -60,6 +60,7 @@ endef
 # 1: etude
 define etude.test.with-coverage
 cd $($(1).root.dir) \
+&& mkdir -p $(test.coverage-report.dir)$(1) \
 && swipl \
 	-g 'coverage(run_tests).' \
 	-g 'cov_save_data("$(test.coverage-data.file)", [append(true)]).' \
