@@ -2,9 +2,6 @@
 
 version: 2.1
 
-orbs:
-  codecov: codecov/codecov@4.1.0
-
 executors:
   docker:
     docker:
@@ -48,6 +45,12 @@ jobs:
   test_coverage:
     executor: docker
     steps:
+      - run:
+          name: Install Codecov CLI
+          command: >-
+            zypper --non-interactive refresh
+            && zypper --non-interactive install python311-codecov
+
       - checkout
 
       - attach_workspace:
@@ -60,8 +63,11 @@ jobs:
             -type f -name '*.bak'
             -exec rm -f {} \;
 
-      - codecov/upload:
-          upload_args: >-
+      - run:
+          name: Upload the coverage reports
+          command: >-
+            codecovli
+            --verbose upload-process --fail-on-error -t ${{ CODECOV_TOKEN }}
             --dir=_build/test-coverage-reports
             --report-type=coverage
 
