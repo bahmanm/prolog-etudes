@@ -74,7 +74,10 @@ jobs:
           name: Upload the coverage reports
           command: >-
             source .env/bin/activate
-            && codecovcli -t ${CODECOV_TOKEN} --verbose upload-process --fail-on-error \
+            && codecovcli --verbose \
+               upload-process \
+               --token ${CODECOV_TOKEN} \
+               --fail-on-error \
                --dir=_build/test-coverage-reports \
                --report-type=coverage
 
