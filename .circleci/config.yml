@@ -3,7 +3,7 @@
 version: 2.1
 
 orbs:
-  codecov: codecov/codecov@4.0.1
+  codecov: codecov/codecov@4.1.0
 
 executors:
   docker:
@@ -61,8 +61,6 @@ jobs:
             -exec rm -f {} \;
 
       - codecov/upload:
-          cli_args: >-
-            --git-service=github
           upload_args: >-
             --dir=_build/test-coverage-reports
             --report-type=coverage
