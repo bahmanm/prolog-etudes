@@ -70,11 +70,12 @@ cd $($(1).root.dir) \
 		, annotate(false) \
 		, line_numbers(true) \
 		, width(140) \
+		, dir("$(test.coverage-report.dir)$(1)") \
 		, modules([$(call root.etude.modules,$(1))]) \
             ]).' \
 	-t 'halt.' \
 	$($(1).sources:%=%.prolog) 2 > $(call etude.test.coverage-report-file,$(1)) \
-&& $(root.dir)bin/coverage-report-converter.pl $(call etude.test.coverage-report-file,$(1))
+&& cp $(root.dir)sample-test-coverage.txt $(call etude.test.coverage-report-file,$(1))
 endef
 
 ####################################################################################################

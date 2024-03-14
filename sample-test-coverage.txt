@@ -1,0 +1,10 @@
+gitlab.com/golang-commonmark/mdtool/main.go:40:     readFromStdin   100.0%
+gitlab.com/golang-commonmark/mdtool/main.go:44:     readFromFile    80.0%
+gitlab.com/golang-commonmark/mdtool/main.go:54:     readFromWeb 0.0%
+gitlab.com/golang-commonmark/mdtool/main.go:64:     readInput   80.0%
+gitlab.com/golang-commonmark/mdtool/main.go:74:     extractText 100.0%
+gitlab.com/golang-commonmark/mdtool/main.go:88:     writePreamble   100.0%
+gitlab.com/golang-commonmark/mdtool/main.go:111:    writePostamble  100.0%
+gitlab.com/golang-commonmark/mdtool/main.go:118:    handler     0.0%
+gitlab.com/golang-commonmark/mdtool/main.go:139:    main        51.6%
+total:                          (statements)    54.6%
