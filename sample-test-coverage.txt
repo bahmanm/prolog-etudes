@@ -1,3 +1,11 @@
 mode: set
 basic-list-techniques/recursion.prolog:5.1,8.37 2 1
 basic-list-techniques/recursion.prolog:24.1,27.26 2 1
+basic-list-techniques/mapping_nested.prolog:3.1,5.40 3 0
+basic-list-techniques/mapping_nested.prolog:7.1,7.42 1 1
+basic-list-techniques/mapping_nested.prolog:8.1,5.48 2 0
+basic-list-techniques/mapping_nested.prolog:10.1,17.40 6 1
+basic-list-techniques/mapping_nested.prolog:19.1,26.40 6 0
+basic-list-techniques/mapping_nested.prolog:30.1,49.75 6 1
+basic-list-techniques/mapping_nested.prolog:54.1,54.32 1 0
+basic-list-techniques/mapping_nested.prolog:55.1,60.47 3 1
