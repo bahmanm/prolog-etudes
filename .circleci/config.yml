@@ -61,6 +61,8 @@ jobs:
             -exec rm -f {} \;
 
       - codecov/upload:
+          cli_args: >-
+            --git-service=github
           upload_args: >-
             --dir=_build/test-coverage-reports
             --report-type=coverage
