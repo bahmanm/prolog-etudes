@@ -57,6 +57,11 @@ jobs:
       - attach_workspace:
           at: _build
 
+      - run:
+          name: Remove the backup files
+          command: >-
+            rm -f _build/test-coverage-reports/*.bak
+
       - codecov/upload:
           upload_args: >-
             --dir=_build/test-coverage-reports/
