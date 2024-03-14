@@ -5,8 +5,6 @@ use warnings ;
 use diagnostics ;
 use utf8 ;
 use feature ':5.38' ;
-use experimental   qw(try) ;
-use Data::Dump     qw(dump) ;
 use Encode         qw(decode_utf8) ;
 use File::Basename qw(fileparse) ;
 use File::Copy     qw(move) ;
