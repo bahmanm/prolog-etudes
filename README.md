@@ -7,6 +7,7 @@
 
 A collection of etudes for folks new to Prolog (and sometimes experienced ones) to learn the
 language in a practical fashion.
+<img alt="prolog-etudes logo" src="https://imgur.com/pBBRDzr.png" style="height: 300px; width: 300px; vertical-align: top" /> 
 
 ## How To Run/Test
 _TBD_
