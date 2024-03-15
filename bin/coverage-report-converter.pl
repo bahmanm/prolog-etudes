@@ -7,7 +7,6 @@ use utf8 ;
 use feature ':5.38' ;
 use Encode         qw(decode_utf8) ;
 use File::Basename qw(fileparse) ;
-use File::Copy     qw(move) ;
 use constant {
   true  => 0,
   false => 1
@@ -15,81 +14,151 @@ use constant {
 
 ####################################################################################################
 
-sub read_coverage_data ( $filepath )
+sub report_raw_rows ( $report_file )
 {
-  open ( my $fh, "<$filepath" ) or die ( "open(): $!\n" ) ;
-  foreach ( 0 .. 3 )
-  {
-    <$fh> ;
-  }
-
-  my @rows = () ;
+  open ( my $fh, "<${report_file}" ) or die ( "open(): $!\n" ) ;
+  my @rows     = () ;
+  my $in_tests = false ;
   while ( my $line = <$fh> )
   {
     chomp ( $line ) ;
-    $line = decode_utf8 ( $line ) ;
-    if ( $line =~ /^\s*\W*\s*$/ )
+    if ( $line =~ /^\s*(?<line_no>\d+)(?<rest>.*)/ )
     {
-      next ;
+      my $line_no = $+{ line_no } ;
+      if ( $+{ rest } =~ /^\s*$/ or $+{ rest } =~ /^%/ )
+      {
+        next ;
+      }
+      elsif ( $+{ rest } =~ /(\s*(?<coverage>[#+\-\d]+))?(?<text>\s*.*)/ )
+      {
+        if ( $+{ text } =~ /^\s*%+/ )
+        {
+          next ;
+        }
+        elsif ( $+{ text } =~ /^\s*:-\s+begin_tests/ )
+        {
+          $in_tests = true ;
+          next ;
+        }
+        elsif ( $+{ text } =~ /^\s*:-\s+end_tests/ )
+        {
+          $in_tests = false ;
+          next ;
+        }
+        elsif ( $+{ text } =~ /^\s*:-/ )
+        {
+          next ;
+        }
+        elsif ( $in_tests == true )
+        {
+          next ;
+        }
+        else
+        {
+          my $row =
+          {
+              line_no  => $line_no,
+              coverage => ( $+{ coverage } or "" ),
+              text     => $+{ text }
+          } ;
+          push ( @rows, $row ) ;
+        }
+      }
+      else
+      {
+        next ;
+      }
     }
-    my @fields = split ( /\s+/, $line ) ;
-    my $row =
-    {
-        file             => $fields[ 0 ],
-        clauses          => $fields[ 2 ],
-        coverage_percent => $fields[ 3 ],
-        failure_percent  => $fields[ 4 ]
-    } ;
-    push ( @rows, $row ) ;
+
   }
   return @rows ;
 }
 
 ####################################################################################################
 
-sub produce_coverage_report ( $coverage_rows, $coverage_file )
+sub compact_rows ( @raw_rows )
 {
-  my ( $etude_name, $coverage_dir, $ext ) = fileparse ( $coverage_file, ( ".txt", ".cov" ) ) ;
-  move ( $coverage_file, "${coverage_file}.bak" ) or die ( "move(): $!\n" ) ;
-
-  open ( my $fh, ">$coverage_file" ) or die ( "open(): $!\n" ) ;
-
-  printf $fh ( "%s\n",            "-" x 78 ) ;
-  printf $fh ( "%20s%s\n",        " ", "SWI-Prologo Code Coverage Report" ) ;
-  printf $fh ( "Directory: %s\n", $etude_name ) ;
-  printf $fh ( "%s\n",            "-" x 78 ) ;
-  print $fh ( "File                                       Lines    Exec  Cover   Missing\n" ) ;
-  printf $fh ( "%s\n", "-" x 78 ) ;
-
-  my ( $total_clauses, $total_tested ) = ( 0, 0 ) ;
-  foreach my $row ( @$coverage_rows )
+  my @clauses   = () ;
+  my $in_clause = false ;
+  my $clause    = {} ;
+  foreach my $raw_row ( @raw_rows )
   {
-    my ( $module_name, $module_dir, $ext ) = fileparse ( $row->{ file }, ( ".prolog" ) ) ;
-    my $not_covered = ( ( 100 - $row->{ coverage_percent } ) * $row->{ clauses } ) / 100 ;
-    my $covered     = $row->{ clauses } - $not_covered ;
-    $total_clauses += $row->{ clauses } ;
-    $total_tested  += $covered ;
-    printf $fh (
-      "%-43s%5u    %4u  %4u%%   %-7u\n",
-      "${module_name}${ext}", $row->{ clauses },
-      $covered, $row->{ coverage_percent }, $not_covered
-    ) ;
-    printf $fh ( "%s\n", "-" x 78 ) ;
+    if ( $in_clause == true )
+    {
+      if ( $raw_row->{ text } =~ /\.(\s*%.*)?$/ )
+      {
+        $clause->{ line_no_end }   = $raw_row->{ line_no } ;
+        $clause->{ column_no_end } = length ( $raw_row->{ text } ) ;
+        push ( @clauses, $clause ) ;
+        $clause    = {} ;
+        $in_clause = false ;
+      }
+    }
+    else
+    {
+      if ( $raw_row->{ text } =~ /^\s*(?<clause_name>\w+).+\.(\s*%.*)?$/ )
+      {
+        $clause->{ line_no_start }   = $raw_row->{ line_no } ;
+        $clause->{ line_no_end }     = $raw_row->{ line_no } ;
+        $clause->{ column_no_start } = 1 ;
+        $clause->{ column_no_end }   = length ( $raw_row->{ text } ) ;
+        if ( $raw_row->{ coverage } =~ /#/ )
+        {
+          $clause->{ covered } = 0 ;
+        }
+        else
+        {
+          $clause->{ covered } = 1 ;
+        }
+        push ( @clauses, $clause ) ;
+        $clause    = {} ;
+        $in_clause = false ;
+      }
+      else
+      {
+        $clause->{ line_no_start }   = $raw_row->{ line_no } ;
+        $clause->{ column_no_start } = 1 ;
+        if ( $raw_row->{ coverage } =~ /#/ )
+        {
+          $clause->{ covered } = 0 ;
+        }
+        else
+        {
+          $clause->{ covered } = 1 ;
+        }
+        $in_clause = true ;
+      }
+    }
   }
-  my $total_coverage    = ( $total_tested / $total_clauses ) * 100 ;
-  my $total_not_covered = $total_clauses - $total_tested ;
-
-  printf $fh (
-    "%-43s%5u    %4u  %4u%%   %-7u\n",
-    "TOTAL", $total_clauses, $total_tested, $total_coverage, $total_not_covered
-  ) ;
-  printf $fh ( "%s\n", "-" x 78 ) ;
-
-  close ( $fh ) ;
+  return @clauses ;
 }
 
 ####################################################################################################
 
-my $coverage_file = shift or die ( "No coverage report specified.\n" ) ;
-my @coverage_rows = read_coverage_data ( $coverage_file ) ;
-produce_coverage_report ( \@coverage_rows, $coverage_file ) ;
+my $reports_root  = shift or die ( "No value for reports_root" ) ;
+my $module_dir    = shift or die ( "No value for module_path" ) ;
+my $module_name   = shift or die ( "No value for module_name" ) ;
+my $target_report = "${reports_root}${module_dir}coverage.txt" ;
+
+printf ( "Processing ${module_dir}${module_name}.prolog.cov...\n" ) ;
+
+my @raw_rows     = report_raw_rows ( "${reports_root}${module_dir}${module_name}.prolog.cov" ) ;
+my @compact_rows = compact_rows ( @raw_rows ) ;
+
+open ( my $fh, ">>${target_report}" ) or die ( "open(): $!\n" ) ;
+if ( -z $target_report )
+{
+  printf $fh ( "mode: set\n" ) ;
+}
+foreach my $row ( @compact_rows )
+{
+  printf $fh (
+    "${module_dir}${module_name}.prolog:%d.%d,%d.%d 1 %d\n",
+    $row->{ line_no_start },
+    $row->{ column_no_start },
+    $row->{ line_no_end },
+    $row->{ column_no_end },
+    $row->{ covered }
+  ) ;
+}
+close ( $fh ) ;
