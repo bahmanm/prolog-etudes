@@ -6,3 +6,12 @@
 
 A collection of etudes for folks new to Prolog (and sometimes experienced ones) to learn the
 language in a practical fashion.
+
+## How To Run/Test
+_TBD_
+
+## CI Pipeline Setup 
+_TBD_
+
+## Test Code Coverage Setup
+_TBD_
