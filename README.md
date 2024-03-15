@@ -9,11 +9,31 @@ A collection of etudes for folks new to Prolog (and sometimes experienced ones) 
 language in a practical fashion.
 <img alt="prolog-etudes logo" src="https://imgur.com/pBBRDzr.png" style="height: 300px; width: 300px; vertical-align: top" /> 
 
-## How To Run/Test
+# How To Run/Test
+
+Assuming you've got all the necessary tooling installed (see below), all you'd need to is
+
+```
+＄ make test
+
+...
+% All 22 tests passed in 0.055 seconds (0.053 cpu)
+```
+
+### Prerequisites
+
+To run the tests all you need to do is a recent SWI-Prolog and the latest
+[bmakelib](https://github.com/bahmanm/bmakelib).
+
+For example on an openSUSE Tumbleweed machine:
+
+```
+# zypper refresh && zypper install make swipl
+# rpm --install --nosignature https://github.com/bahmanm/bmakelib/releases/download/v0.7.0/bmakelib-0.7.0-1.1.noarch.rpm
+```
+
+# CI Pipeline Setup 
 _TBD_
 
-## CI Pipeline Setup 
-_TBD_
-
-## Test Code Coverage Setup
+# Test Code Coverage Setup
 _TBD_
