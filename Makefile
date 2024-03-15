@@ -76,8 +76,8 @@ cd $($(1).root.dir) \
             ]).' \
 	-t 'halt.' \
 	$($(1).sources:%=%.prolog) \
-$(foreach cov-report,$($(1).sources:%=$(1)/%.prolog.cov),\
-	&& $(test.coverage-report.processor) $(test.coverage-report.dir) $(cov-report))
+$(foreach module,$($(1).sources),\
+	&& $(test.coverage-report.processor) $(test.coverage-report.dir) $(1)/ $(module))
 endef
 
 ####################################################################################################

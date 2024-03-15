@@ -135,20 +135,25 @@ sub compact_rows ( @raw_rows )
 
 ####################################################################################################
 
-my $reports_root = shift or die ( "No value for reports_root" ) ;
-my $module_path  = shift or die ( "No value for module_path" ) ;
+my $reports_root  = shift or die ( "No value for reports_root" ) ;
+my $module_dir    = shift or die ( "No value for module_path" ) ;
+my $module_name   = shift or die ( "No value for module_name" ) ;
+my $target_report = "${reports_root}${module_dir}coverage.txt" ;
 
-printf ( "Processing ${module_path}...\n" ) ;
+printf ( "Processing ${module_dir}${module_name}.prolog.cov...\n" ) ;
 
-my @raw_rows     = report_raw_rows ( "${reports_root}/${module_path}" ) ;
+my @raw_rows     = report_raw_rows ( "${reports_root}${module_dir}${module_name}.prolog.cov" ) ;
 my @compact_rows = compact_rows ( @raw_rows ) ;
 
-open ( my $fh, ">${reports_root}${module_path}.txt" ) or die ( "open(): $!\n" ) ;
-printf $fh ( "mode: set\n" ) ;
+open ( my $fh, ">>${target_report}" ) or die ( "open(): $!\n" ) ;
+if ( -z $target_report )
+{
+  printf $fh ( "mode: set\n" ) ;
+}
 foreach my $row ( @compact_rows )
 {
   printf $fh (
-    "${module_path}:%d.%d,%d.%d 1 %d\n",
+    "${module_dir}${module_name}.prolog:%d.%d,%d.%d 1 %d\n",
     $row->{ line_no_start },
     $row->{ column_no_start },
     $row->{ line_no_end },
