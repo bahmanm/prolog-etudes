@@ -6,7 +6,7 @@
 [![Matrix](https://img.shields.io/matrix/github-bahmanm-prolog-etudes%3Amatrix.org?server_fqdn=matrix.org&style=social&logo=matrix)](https://matrix.to/#/#github-bahmanm-prolog-etudes:matrix.org)
 
 A collection of etudes for folks new to Prolog (and sometimes experienced ones) to learn the
-language in a practical fashion.
+language in a practical fashion.  
 <img alt="prolog-etudes logo" src="https://imgur.com/pBBRDzr.png" style="height: 300px; width: 300px; vertical-align: top" /> 
 
 # How To Run/Test
