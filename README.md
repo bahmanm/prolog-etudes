@@ -33,7 +33,15 @@ For example on an openSUSE Tumbleweed machine:
 ```
 
 # CI Pipeline Setup 
-_TBD_
 
-# Test Code Coverage Setup
+_I have used [CircleCI](https://circleci.com/) as the CI service for this project._
+
+You can view the configuration at [.circleci/config.yml](https://github.com/bahmanm/prolog-etudes/blob/c7218f9c64ca430559629ce544aa25dfca53bfb6/.circleci/config.yml). 
+
+* Line 8: [uses the bmakelib Docker image](https://github.com/bahmanm/prolog-etudes/blob/c7218f9c64ca430559629ce544aa25dfca53bfb6/.circleci/config.yml#L8) 
+from the [bdockerimg project](https://github.com/bahmanm/bdockerimg).
+* Line 25: Install SWI-Prolog
+* Line 31: Run the tests
+
+### Test Code Coverage Setup
 _TBD_
