@@ -39,6 +39,7 @@ test : $(etudes:%=%.test)
 ####################################################################################################
 
 test.coverage-report.dir := $(build.dir)test-coverage-reports/
+test.coverage-report.processor := $(root.dir)bin/coverage-report-converter.pl
 test.coverage-data.file := $(build.dir)test-coverage.data
 
 ####################################################################################################
@@ -67,14 +68,16 @@ cd $($(1).root.dir) \
 	-g 'show_coverage([ \
 		  all(false) \
 		, color(false) \
-		, annotate(false) \
+		, annotate(true) \
+		, dir("$(test.coverage-report.dir)$(1)") \
 		, line_numbers(true) \
 		, width(140) \
 		, modules([$(call root.etude.modules,$(1))]) \
             ]).' \
 	-t 'halt.' \
-	$($(1).sources:%=%.prolog) 2 > $(call etude.test.coverage-report-file,$(1)) \
-&& $(root.dir)bin/coverage-report-converter.pl $(call etude.test.coverage-report-file,$(1))
+	$($(1).sources:%=%.prolog) \
+$(foreach cov-report,$($(1).sources:%=$(1)/%.prolog.cov),\
+	&& $(test.coverage-report.processor) $(test.coverage-report.dir) $(cov-report))
 endef
 
 ####################################################################################################
