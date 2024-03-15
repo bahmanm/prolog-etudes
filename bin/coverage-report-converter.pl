@@ -14,7 +14,7 @@ use constant {
 
 ####################################################################################################
 
-sub report_raw_rows ( $report_file )
+sub load_prolog_report ( $report_file )
 {
   open ( my $fh, "<${report_file}" ) or die ( "open(): $!\n" ) ;
   my @rows     = () ;
@@ -76,7 +76,7 @@ sub report_raw_rows ( $report_file )
 
 ####################################################################################################
 
-sub compact_rows ( @raw_rows )
+sub rows_to_clauses ( @raw_rows )
 {
   my @clauses   = () ;
   my $in_clause = false ;
@@ -142,23 +142,23 @@ my $target_report = "${reports_root}${module_dir}coverage.txt" ;
 
 printf ( "Processing ${module_dir}${module_name}.prolog.cov...\n" ) ;
 
-my @raw_rows     = report_raw_rows ( "${reports_root}${module_dir}${module_name}.prolog.cov" ) ;
-my @compact_rows = compact_rows ( @raw_rows ) ;
+my @raw_rows = load_prolog_report ( "${reports_root}${module_dir}${module_name}.prolog.cov" ) ;
+my @clauses  = rows_to_clauses ( @raw_rows ) ;
 
 open ( my $fh, ">>${target_report}" ) or die ( "open(): $!\n" ) ;
 if ( -z $target_report )
 {
   printf $fh ( "mode: set\n" ) ;
 }
-foreach my $row ( @compact_rows )
+foreach my $clause ( @clauses )
 {
   printf $fh (
     "${module_dir}${module_name}.prolog:%d.%d,%d.%d 1 %d\n",
-    $row->{ line_no_start },
-    $row->{ column_no_start },
-    $row->{ line_no_end },
-    $row->{ column_no_end },
-    $row->{ covered }
+    $clause->{ line_no_start },
+    $clause->{ column_no_start },
+    $clause->{ line_no_end },
+    $clause->{ column_no_end },
+    $clause->{ covered }
   ) ;
 }
 close ( $fh ) ;

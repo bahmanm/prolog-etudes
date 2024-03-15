@@ -64,13 +64,6 @@ jobs:
           at: _build
 
       - run:
-          name: Remove the backup files
-          command: >-
-            find _build/test-coverage-reports
-            -type f -name '*.bak'
-            -exec rm -f {} \;
-
-      - run:
           name: Upload the coverage reports
           command: >-
             source .env/bin/activate
