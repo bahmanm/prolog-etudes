@@ -5,7 +5,7 @@ version: 2.1
 executors:
   docker:
     docker:
-      - image: bdockerimg/bmakelib:0.7.0--opensuse-tumbleweed
+      - image: bdockerimg/bmakelib:0.8.0--opensuse-tumbleweed
         auth:
           username: "${DOCKER_USER}"
           password: "${DOCKER_TOKEN}"
